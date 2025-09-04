@@ -27,6 +27,7 @@ export default defineConfig({
   ],
   build: {
     target: 'esnext',
+    outDir: 'build' // изменяем с 'dist' на 'build'
   },
   publicDir: './public',
   server: {
