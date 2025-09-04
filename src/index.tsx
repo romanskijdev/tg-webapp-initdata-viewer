@@ -1,19 +1,40 @@
-import React from 'react';
+// Include Telegram UI styles first to allow our code override the package CSS.
+import '@telegram-apps/telegram-ui/dist/styles.css';
+
 import ReactDOM from 'react-dom/client';
+import { StrictMode } from 'react';
+import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
+
+import { Root } from '@/components/Root.tsx';
+import { EnvUnsupported } from '@/components/EnvUnsupported.tsx';
+import { init } from '@/init.ts';
+
 import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// Mock the environment in case, we are outside Telegram.
+import './mockEnv.ts';
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+const root = ReactDOM.createRoot(document.getElementById('root')!);
+
+try {
+  const launchParams = retrieveLaunchParams();
+  const { tgWebAppPlatform: platform } = launchParams;
+  const debug = (launchParams.tgWebAppStartParam || '').includes('platformer_debug')
+    || import.meta.env.DEV;
+
+  // Configure all application dependencies.
+  await init({
+    debug,
+    eruda: debug && ['ios', 'android'].includes(platform),
+    mockForMacOS: platform === 'macos',
+  })
+    .then(() => {
+      root.render(
+        <StrictMode>
+          <Root/>
+        </StrictMode>,
+      );
+    });
+} catch (e) {
+  root.render(<EnvUnsupported/>);
+}
