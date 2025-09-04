@@ -5,7 +5,7 @@ import mkcert from 'vite-plugin-mkcert';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/reactjs-template/',
+  base: '/',
   css: {
     preprocessorOptions: {
       scss: {
@@ -27,7 +27,6 @@ export default defineConfig({
   ],
   build: {
     target: 'esnext',
-    outDir: 'build' // изменяем с 'dist' на 'build'
   },
   publicDir: './public',
   server: {
